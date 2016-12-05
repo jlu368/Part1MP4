@@ -45,7 +45,7 @@ def main():
     states = {}
     hit = 0
     games = 0
-    alpha = .0005
+    alpha = .00005
 
     for x in range(15):
         for y in range(15):
