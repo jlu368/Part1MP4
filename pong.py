@@ -41,15 +41,15 @@ def main():
     gamma = .9
     paddle_height = .2
     init_state = (.5, .5, .03, .01, .5 - paddle_height/2)
-    cur_state = random_state()
+    cur_state = init_state#random_state()
     states = {}
     hit = 0
     games = 0
-    alpha = 1
+    alpha = .00005
 
-    for x in range(25):
-        for y in range(25):
-            for paddle in range(25):
+    for x in range(15):
+        for y in range(15):
+            for paddle in range(15):
                 for xvel in [-1,1]:
                     for yvel in [-1,0,1]:
                         new_state = State((x,y), paddle, xvel, yvel)
@@ -59,20 +59,20 @@ def main():
     while True:
         cur_state, states, hit = step(cur_state, states, hit, alpha, gamma)
         discrete = discretize(cur_state)
-        if cur_state[0] > 1:
+        if discrete.fail():
             # exit()
             # if hit > 0:
             #     print(hit)
             games += 1
-            alpha = 1000/(1000 + games)
+            # alpha = 1000/(1000 + games)
             # print(games)
             if games % 10000 == 0:
                 hit = final_q(init_state, states, 0, 0)
                 # import IPython
                 # IPython.embed()
                 print(hit)
-            cur_state = random_state()
-            # cur_state = init_state
+            # cur_state = random_state()
+            cur_state = init_state
             hit = 0
 
 
@@ -102,15 +102,16 @@ def final_q(cur_state, states, hit, step):
 
 
 def print_board(state):
-    for x in range(25):
-        for y in range(25):
+    for x in range(15):
+        for y in range(15):
             if state.ball_loc == (x,y):
                 print("o", end='')
-            elif x == 24 and y == state.paddle_loc:
+            elif x == 14 and y == state.paddle_loc:
                 print('_', end='')
             else:
                 print(' ', end='')
         print()
+    print('-----------------------')
 
 
 def step(state, discrete_states, hit, alpha, gamma):
@@ -168,7 +169,7 @@ def next_state(state, action, hit):
             new_xvelo = -.03
         new_yvelo += v
         hit += 1
-        reward = 1
+        reward = 3
     elif new_xpos > 1:
         reward = -1
 
@@ -187,11 +188,18 @@ def next_state(state, action, hit):
     return new_state, reward, hit
 
 def discretize(state):
-    if (state[0] >= 1 and not (state[4] <= state[1] <= state[4] + .2)) or int(state[0]*24)>24:
+    # if state[0] > 1:
+    #     import IPython
+    #     IPython.embed()
+    if (state[0] >= 1 and not (state[4] <= state[1] <= state[4] + .2)):
         return State((-1,-1), 0, 0, 0)
-    coords = (int(state[0]*24), int(state[1]*24))
-    paddle = int(state[4]*24)
-
+    coords = (int(state[0]*14), int(state[1]*14))
+    paddle = int(state[4]*14)
+    if coords[0] >= 15:
+        coords = (14, coords[1])
+        # import IPython
+        # IPython.embed()
+        # exit()
     if state[2] > 0:
         xvel = 1
     else:
