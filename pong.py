@@ -1,4 +1,4 @@
-import random, itertools, json
+import random, itertools
 import numpy as np
 
 class State:
@@ -190,12 +190,10 @@ def discretize(state):
     if (state[0] >= 1 and not (state[4] <= state[1] <= state[4] + .2)):
         return State((-1,-1), 0, 0, 0)
     coords = (int(state[0]*14), int(state[1]*14))
-    paddle = int(state[4]*14)
+    paddle = int(14 * state[4] / .8)
     if coords[0] >= 15:
         coords = (14, coords[1])
-        # import IPython
-        # IPython.embed()
-        # exit()
+
     if state[2] > 0:
         xvel = 1
     else:
