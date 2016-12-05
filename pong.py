@@ -41,7 +41,7 @@ def main():
     gamma = .9
     paddle_height = .2
     init_state = (.5, .5, .03, .01, .5 - paddle_height/2)
-    cur_state = init_state#random_state()
+    cur_state = init_state
     states = {}
     hit = 0
     games = 0
@@ -67,10 +67,13 @@ def main():
             # alpha = 1000/(1000 + games)
             # print(games)
             if games % 10000 == 0:
-                hit = final_q(init_state, states, 0, 0)
-                # import IPython
-                # IPython.embed()
-                print(hit)
+                count = 0
+                xhit = 0
+                while count < 1001:
+                    xhit += final_q(init_state, states, 0, 0)
+                    # xhit += thit
+                    count += 1
+                print(xhit/1000)
             # cur_state = random_state()
             cur_state = init_state
             hit = 0
@@ -78,14 +81,8 @@ def main():
 
 def final_q(cur_state, states, hit, step):
     disc = discretize(cur_state)
-    print_board(disc)
-    # if 20 > step >= 16:
-    #     import IPython
-    #     IPython.embed()
-        # exit()
+
     if disc.fail():
-        # import IPython
-        # IPython.embed()
         return hit
 
     val = states[disc]
