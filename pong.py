@@ -33,7 +33,7 @@ def random_state():
     ball_y = random.uniform(0,1)
     x_vel = .03 * random.choice([-1,1])
     y_vel = .03 * random.choice([-1,0,1])
-    paddle = random.uniform(0,1)
+    paddle = random.uniform(0,.8)
 
     return (ball_x, ball_y, x_vel, y_vel, paddle)
 
@@ -45,7 +45,7 @@ def main():
     states = {}
     hit = 0
     games = 0
-    alpha = .00005
+    alpha = .0005
 
     for x in range(15):
         for y in range(15):
@@ -60,9 +60,6 @@ def main():
         cur_state, states, hit = step(cur_state, states, hit, alpha, gamma)
         discrete = discretize(cur_state)
         if discrete.fail():
-            # exit()
-            # if hit > 0:
-            #     print(hit)
             games += 1
             # alpha = 1000/(1000 + games)
             # print(games)
@@ -71,7 +68,6 @@ def main():
                 xhit = 0
                 while count < 1001:
                     xhit += final_q(init_state, states, 0, 0)
-                    # xhit += thit
                     count += 1
                 print(xhit/1000)
             # cur_state = random_state()
@@ -113,16 +109,19 @@ def print_board(state):
 
 def step(state, discrete_states, hit, alpha, gamma):
     action = random.randint(0,2)
+    disc = discretize(state)
+
     new_state, q, hit = next_state(state, action, hit)
     q += gamma * max_q(new_state, discrete_states)
-    val = discrete_states[discretize(state)]
+    val = discrete_states[disc]
     td_val = val[action] + alpha*(q-val[action])
+
     if action == 0:
-        discrete_states[discretize(state)] = (td_val, val[1], val[2])
+        discrete_states[disc] = (td_val, val[1], val[2])
     elif action == 1:
-        discrete_states[discretize(state)] = (val[0], td_val, val[2])
+        discrete_states[disc] = (val[0], td_val, val[2])
     else:
-        discrete_states[discretize(state)] = (val[0], val[1], td_val)
+        discrete_states[disc] = (val[0], val[1], td_val)
 
     return new_state, discrete_states, hit
 
@@ -202,12 +201,12 @@ def discretize(state):
     else:
         xvel = -1
 
-    if state[3] > 0:
-        yvel = 1
+    if abs(state[3]) < .015:
+        yvel = 0
     elif state[3] < 0:
         yvel = -1
     else:
-        yvel = 0
+        yvel = 1
 
     return State(coords, paddle, xvel, yvel)
 
